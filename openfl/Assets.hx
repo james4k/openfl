@@ -429,7 +429,7 @@ class Assets {
 		
 		#else
 		
-		return (bitmapData != null && #if !lime_hybrid bitmapData.__image != null #else bitmapData.__handle != null #end);
+		return (bitmapData != null && #if !lime_hybrid bitmapData.image != null #else bitmapData.__handle != null #end);
 		
 		#end
 		#end
@@ -1162,9 +1162,9 @@ class Assets {
 				
 				if (preload != null) {
 					
-					__image = preload;
-					width = __image.width;
-					height = __image.height;
+					image = preload;
+					width = image.width;
+					height = image.height;
 					
 				} else {
 					
@@ -1172,7 +1172,7 @@ class Assets {
 						
 						if (preload == null) {
 							
-							preload = b.__image;
+							preload = b.image;
 							
 						}
 						

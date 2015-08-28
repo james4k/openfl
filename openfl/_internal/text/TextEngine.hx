@@ -331,9 +331,9 @@ class TextEngine {
 					fontList = [ systemFontDirectory + "/" + format.font ];
 				
 			}
-
+			
 			#if lime_console
-
+				
 				// TODO(james4k): until we figure out our story for the above switch
 				// statement, always load arial unless a file is specified.
 				if (format == null
@@ -342,7 +342,7 @@ class TextEngine {
 				) {
 					fontList = [ "arial.ttf" ];
 				}
-
+				
 			#end
 			
 			if (fontList != null) {
@@ -530,13 +530,13 @@ class TextEngine {
 		
 		if (numLines == 1) {
 			
-			if (textHeight <= height - 2) {
+			bottomScrollV = 1;
+			
+			if (currentLineLeading > 0) {
 				
-				bottomScrollV = 1;
+				textHeight += currentLineLeading;
 				
 			}
-			
-			textHeight += currentLineLeading;
 			
 		} else if (textHeight <= height - 2) {
 			
@@ -706,11 +706,23 @@ class TextEngine {
 				
 				font = getFontInstance (currentFormat);
 				
-				ascent = (font.ascender / font.unitsPerEM) * currentFormat.size;
-				descent = Math.abs ((font.descender / font.unitsPerEM) * currentFormat.size);
-				leading = currentFormat.leading;
-				
-				heightValue = ascent + descent + leading;
+				if (font != null) {
+					
+					ascent = (font.ascender / font.unitsPerEM) * currentFormat.size;
+					descent = Math.abs ((font.descender / font.unitsPerEM) * currentFormat.size);
+					leading = currentFormat.leading;
+					
+					heightValue = ascent + descent + leading;
+					
+				} else {
+					
+					ascent = currentFormat.size;
+					descent = currentFormat.size * 0.185;
+					leading = currentFormat.leading;
+					
+					heightValue = ascent + descent + leading;
+					
+				}
 				
 				#end
 				
@@ -769,7 +781,7 @@ class TextEngine {
 					
 				}
 				
-			} else if (formatRange.end >= spaceIndex) {
+			} else if (formatRange.end >= spaceIndex && spaceIndex > -1) {
 				
 				layoutGroup = null;
 				wrap = false;
@@ -905,6 +917,7 @@ class TextEngine {
 					
 					if (formatRange.end <= previousSpaceIndex) {
 						
+						layoutGroup = null;
 						nextFormatRange ();
 						
 					}
@@ -918,6 +931,12 @@ class TextEngine {
 				}
 				
 			} else {
+				
+				if (textIndex >= formatRange.end) {
+					
+					break;
+					
+				}
 				
 				layoutGroup = new TextLayoutGroup (formatRange.format, textIndex, formatRange.end);
 				layoutGroup.advances = getAdvances (text, textIndex, formatRange.end);
@@ -933,16 +952,13 @@ class TextEngine {
 				
 				offsetX += layoutGroup.width;
 				
-				textIndex = formatRange.end + 1;
+				textIndex = formatRange.end;
 				
 				nextFormatRange ();
 				
 			}
 			
 		}
-		
-		lineIndex = 0;
-		offsetX = 0;
 		
 	}
 	
