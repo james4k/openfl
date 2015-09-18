@@ -1,5 +1,5 @@
 package haxe;
-#if (macro || (!neko && !cpp && !nodejs))
+#if (!neko && !cpp && !nodejs)
 
 
 // Original haxe.Timer class
@@ -41,7 +41,6 @@ package haxe;
 	the child class.
 **/
 class Timer {
-	#if (flash || js || java || python)
 
 	#if (flash || js)
 		private var id : Null<Int>;
@@ -131,8 +130,6 @@ class Timer {
 		};
 		return t;
 	}
-
-	#end
 
 	/**
 		Measures the time it takes to execute `f`, in seconds with fractions.
@@ -309,7 +306,7 @@ class Timer {
 	}
 	
 	
-	@:noCompletion public static function __checkTimers () {
+	@:noCompletion @:dox(hide) public static function __checkTimers () {
 		
 		var now = getMS ();
 		var foundNull = false;
@@ -339,7 +336,7 @@ class Timer {
 	
 	
 	#if (lime_legacy || lime_hybrid)
-	@:noCompletion public static function __nextWake (limit:Float):Float {
+	@:noCompletion @:dox(hide) public static function __nextWake (limit:Float):Float {
 		
 		var now = getMS ();
 		var sleep;

@@ -757,31 +757,36 @@ import openfl.Lib;
 		
 		if (!anisotropySupportTested) {
 			
-			#if openfl_legacy
+			#if !js
 			
 			supportsAnisotropy = (GL.getSupportedExtensions ().indexOf ("GL_EXT_texture_filter_anisotropic") != -1);
 			
+			if (supportsAnisotropy) {
+				// GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT is not currently recongnised in Lime
+				// If supported, max anisotropic filtering of 256 is assumed.
+				// maxSupportedAnisotropy = GL.getTexParameter (GL.TEXTURE_2D, MAX_TEXTURE_MAX_ANISOTROPY_EXT);
+				GL.texParameteri (GL.TEXTURE_2D, TEXTURE_MAX_ANISOTROPY_EXT, maxSupportedAnisotropy);
+			}
+
 			#else
-			
+
 			var ext:Dynamic = GL.getExtension ("EXT_texture_filter_anisotropic");
-			if (ext == null) ext = GL.getExtension ("MOZ_EXT_texture_filter_anisotropic");
-			if (ext == null) ext = GL.getExtension ("WEBKIT_EXT_texture_filter_anisotropic");
+			if (ext == null || Reflect.field( ext, "MAX_TEXTURE_MAX_ANISOTROPY_EXT" ) == null) ext = GL.getExtension ("MOZ_EXT_texture_filter_anisotropic");
+			if (ext == null || Reflect.field( ext, "MAX_TEXTURE_MAX_ANISOTROPY_EXT" ) == null) ext = GL.getExtension ("WEBKIT_EXT_texture_filter_anisotropic");
 			supportsAnisotropy = (ext != null);
+			
+			if (supportsAnisotropy) {
+				maxSupportedAnisotropy = GL.getParameter (ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
+				GL.texParameteri (GL.TEXTURE_2D, TEXTURE_MAX_ANISOTROPY_EXT, maxSupportedAnisotropy);
+			}
 			
 			#end
 			
 			anisotropySupportTested = true;
-			
-			GL.texParameterf (GL.TEXTURE_2D, TEXTURE_MAX_ANISOTROPY_EXT, maxSupportedAnisotropy);
-			maxSupportedAnisotropy = GL.getTexParameter (GL.TEXTURE_2D, TEXTURE_MAX_ANISOTROPY_EXT);
-			
+						
 		}
 		
 		if (Std.is (texture, Texture)) {
-			
-			#if (cpp || neko || nodejs)
-			GL.bindTexture (GL.TEXTURE_2D, cast (texture, Texture).glTexture);
-			#end
 			
 			switch (wrap) {
 				
@@ -840,12 +845,10 @@ import openfl.Lib;
 				
 				case Context3DMipFilter.MIPLINEAR:
 					
-					GL.generateMipmap (GL.TEXTURE_2D);
 					GL.texParameteri (GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_LINEAR);
 				
 				case Context3DMipFilter.MIPNEAREST:
 					
-					GL.generateMipmap (GL.TEXTURE_2D);
 					GL.texParameteri (GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST_MIPMAP_NEAREST);
 				
 				case Context3DMipFilter.MIPNONE:
@@ -853,12 +856,15 @@ import openfl.Lib;
 					GL.texParameteri (GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, filter == Context3DTextureFilter.NEAREST ? GL.NEAREST : GL.LINEAR);
 				
 			} 
+
+			var tex:Texture = cast texture;
+			if (mipfilter != Context3DMipFilter.MIPNONE && !tex.mipmapsGenerated) {
+				GL.generateMipmap (GL.TEXTURE_2D);
+				tex.mipmapsGenerated = true;
+			}
+					
 			
 		} else if (Std.is (texture, RectangleTexture)) {
-			
-			#if (cpp || neko || nodejs)
-			GL.bindTexture (GL.TEXTURE_2D, cast(texture, RectangleTexture).glTexture);
-			#end
 			
 			GL.texParameteri (GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
 			GL.texParameteri (GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
@@ -902,10 +908,6 @@ import openfl.Lib;
 			GL.texParameteri (GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, filter == Context3DTextureFilter.NEAREST ? GL.NEAREST : GL.LINEAR);
 			
 		} else if (Std.is (texture, CubeTexture)) {
-			
-			#if (cpp || neko || nodejs)
-			GL.bindTexture (GL.TEXTURE_CUBE_MAP, cast (texture, CubeTexture).glTexture);
-			#end
 			
 			switch (wrap) {
 				
@@ -973,6 +975,12 @@ import openfl.Lib;
 				
 			}
 			
+			var cubetex:CubeTexture = cast texture;
+			if (mipfilter != Context3DMipFilter.MIPNONE && !cubetex.mipmapsGenerated) {
+				GL.generateMipmap (GL.TEXTURE_CUBE_MAP);
+				cubetex.mipmapsGenerated = true;
+			}
+
 		} else {
 			
 			throw "Texture of type " + Type.getClassName (Type.getClass (texture)) + " not supported yet";

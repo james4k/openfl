@@ -751,11 +751,17 @@ class GraphicsRenderer {
 	}
 	
 	public static function render (object:DisplayObject, renderSession:RenderSession):Void {
+		
 		var graphics = object.__graphics;
+		var bounds = graphics.__bounds;
 		var spritebatch = renderSession.spriteBatch;
 		var dirty = graphics.__dirty;
-		if (graphics.__commands.length <= 0) {
+		
+		if (!graphics.__visible || graphics.__commands.length == 0 || bounds == null || bounds.width == 0 || bounds.height == 0) {
+			
+			graphics.__glStack.splice (0, graphics.__glStack.length);
 			return;
+			
 		}
 		
 		if (dirty) {
@@ -810,6 +816,7 @@ class GraphicsRenderer {
 		var gl = renderSession.gl;
 		
 		var glStack = graphics.__glStack[GLRenderer.glContextId];
+		if (glStack == null) return;
 		var bucket:GLBucket;
 		
 		var translationMatrix:Matrix;
@@ -1141,7 +1148,7 @@ class GraphicsRenderer {
 		gl.bindTexture(gl.TEXTURE_2D, bucket.texture);
 		
 		// TODO Fix this: webgl can only repeat textures that are power of two
-		if (bucket.textureRepeat #if (js && html5) && bucket.bitmap.image.powerOfTwo #end) {
+		if (bucket.textureRepeat #if (!desktop || rpi) && bucket.bitmap.image.powerOfTwo #end) {
 			gl.texParameteri (gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
 			gl.texParameteri (gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
 		} else {
@@ -1154,7 +1161,7 @@ class GraphicsRenderer {
 			gl.texParameteri (gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 		} else {
 			gl.texParameteri (gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-			gl.texParameteri (gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);						
+			gl.texParameteri (gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 		}
 		
 	}
@@ -1486,7 +1493,7 @@ class GLBucketData {
 			
 			if (glVerts.length <= lastVertsSize) {
 				vertexArray.bind();
-				var end = glLength * 4 * stride;
+				var end = glLength * stride;
 				if (glLength > 0 && lastVertsSize > end) {
 					var view = glVerts.subarray(0, end);
 					vertexArray.upload(view);

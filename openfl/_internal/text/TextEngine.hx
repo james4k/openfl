@@ -3,7 +3,7 @@ package openfl._internal.text;
 
 import haxe.Timer;
 import haxe.Utf8;
-import lime.graphics.cairo.CairoFont;
+import lime.graphics.cairo.CairoFontFace;
 import lime.graphics.opengl.GLTexture;
 import lime.system.System;
 import lime.text.TextLayout;
@@ -109,7 +109,9 @@ class TextEngine {
 	@:noCompletion private var __tileData:Map<Tilesheet, Array<Float>>;
 	@:noCompletion private var __tileDataLength:Map<Tilesheet, Int>;
 	@:noCompletion private var __tilesheets:Map<Tilesheet, Bool>;
-	@:noCompletion public var __cairoFont:CairoFont;
+	
+	@:noCompletion @:dox(hide) public var __cairoFont:CairoFontFace;
+	@:noCompletion @:dox(hide) public var __font:Font;
 	
 	#if (js && html5)
 	private var __hiddenInput:InputElement;
@@ -168,7 +170,7 @@ class TextEngine {
 			
 			if (registeredFont == null) continue;
 			
-			if (registeredFont.fontName == name || (registeredFont.__fontPath != null && (registeredFont.__fontPath == name || Path.withoutDirectory (registeredFont.__fontPath) == name))) {
+			if (registeredFont.fontName == name || (registeredFont.__fontPath != null && (registeredFont.__fontPath == name || registeredFont.__fontPathWithoutDirectory == name))) {
 				
 				return registeredFont;
 				
@@ -569,8 +571,12 @@ class TextEngine {
 		
 		var currentFormat = TextField.__defaultTextFormat.clone ();
 		
-		var ascent, descent, leading, layoutGroup;
-		var advances, widthValue, heightValue;
+		var leading = 0;
+		var ascent = 0.0;
+		var descent = 0.0;
+		
+		var layoutGroup, advances;
+		var widthValue, heightValue = 0.0;
 		
 		var spaceWidth = 0.0;
 		var previousSpaceIndex = 0;
@@ -584,7 +590,7 @@ class TextEngine {
 		var lineIndex = 0;
 		var lineFormat = null;
 		
-		var getAdvances = function (text:String, startIndex:Int, endIndex:Int):Array<Float> {
+		inline function getAdvances (text:String, startIndex:Int, endIndex:Int):Array<Float> {
 			
 			// TODO: optimize
 			
@@ -631,7 +637,7 @@ class TextEngine {
 			
 		}
 		
-		var getAdvancesWidth = function (advances:Array<Float>):Float {
+		inline function getAdvancesWidth (advances:Array<Float>):Float {
 			
 			var width = 0.0;
 			
@@ -645,7 +651,7 @@ class TextEngine {
 			
 		}
 		
-		var getTextWidth = function (text:String):Float {
+		inline function getTextWidth (text:String):Float {
 			
 			#if (js && html5)
 			
@@ -684,7 +690,7 @@ class TextEngine {
 			
 		}
 		
-		var nextFormatRange = function ():Void {
+		inline function nextFormatRange ():Void {
 			
 			if (rangeIndex < textFormatRanges.length - 1) {
 				
@@ -860,7 +866,7 @@ class TextEngine {
 						layoutGroup.height = heightValue;
 						layoutGroups.push (layoutGroup);
 						
-						offsetX += widthValue + spaceWidth;
+						offsetX = widthValue + spaceWidth;
 						marginRight = spaceWidth;
 						
 						wrap = false;

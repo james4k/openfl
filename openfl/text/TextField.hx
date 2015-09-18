@@ -1257,7 +1257,7 @@ class TextField extends InteractiveObject {
 		if (!visible || __isMask || (interactiveOnly && !mouseEnabled)) return false;
 		if (mask != null && !mask.__hitTestMask (x, y)) return false;
 		
-		__getTransform ();
+		__getWorldTransform ();
 		__updateLayout ();
 		
 		var px = __worldTransform.__transformInverseX (x, y);
@@ -1282,7 +1282,7 @@ class TextField extends InteractiveObject {
 	
 	@:noCompletion private override function __hitTestMask (x:Float, y:Float):Bool {
 		
-		__getTransform ();
+		__getWorldTransform ();
 		__updateLayout ();
 		
 		var px = __worldTransform.__transformInverseX (x, y);
@@ -1299,7 +1299,7 @@ class TextField extends InteractiveObject {
 	}
 	
 	
-	@:noCompletion public override function __renderCairo (renderSession:RenderSession):Void {
+	@:noCompletion @:dox(hide) public override function __renderCairo (renderSession:RenderSession):Void {
 		
 		CairoTextField.render (this, renderSession);
 		super.__renderCairo (renderSession);
@@ -1307,7 +1307,7 @@ class TextField extends InteractiveObject {
 	}
 	
 	
-	@:noCompletion public override function __renderCanvas (renderSession:RenderSession):Void {
+	@:noCompletion @:dox(hide) public override function __renderCanvas (renderSession:RenderSession):Void {
 		
 		CanvasTextField.render (this, renderSession);
 		
@@ -1344,14 +1344,16 @@ class TextField extends InteractiveObject {
 	}
 	
 	
-	@:noCompletion public override function __renderDOM (renderSession:RenderSession):Void {
+	@:noCompletion @:dox(hide) public override function __renderDOM (renderSession:RenderSession):Void {
 		
 		DOMTextField.render (this, renderSession);
 		
 	}
 	
 	
-	@:noCompletion public override function __renderGL (renderSession:RenderSession):Void {
+	@:noCompletion @:dox(hide) public override function __renderGL (renderSession:RenderSession):Void {
+		
+		__preRenderGL(renderSession);
 		
 		#if !disable_cairo_graphics
 		
@@ -1368,6 +1370,8 @@ class TextField extends InteractiveObject {
 		//GLTextField.render (this, renderSession);
 		
 		#end
+		
+		__postRenderGL(renderSession);
 		
 	}
 	
@@ -2285,7 +2289,7 @@ class TextField extends InteractiveObject {
 		
 		if (stage.focus == this) {
 			
-			__getTransform ();
+			__getWorldTransform ();
 			__updateLayout ();
 			
 			var px = __worldTransform.__transformInverseX (x, y);
