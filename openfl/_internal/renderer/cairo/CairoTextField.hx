@@ -82,7 +82,6 @@ class CairoTextField {
 			}
 			
 			cairo.fontOptions = options;
-			options.destroy ();
 			
 		}
 		
