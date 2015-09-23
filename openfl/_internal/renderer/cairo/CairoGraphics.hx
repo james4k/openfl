@@ -224,8 +224,8 @@ class CairoGraphics {
 				var bitmap = new BitmapData (Math.floor (bounds.width), Math.floor (bounds.height), true);
 				var surface = bitmap.getSurface ();
 				graphics.__cairo = new Cairo (surface);
-				bitmap.destroySurface ();
-
+				surface.destroy ();
+				
 				graphics.__bitmap = bitmap;
 				
 			}
@@ -1208,8 +1208,8 @@ class CairoGraphics {
 				var bitmap = new BitmapData (Math.floor (bounds.width), Math.floor (bounds.height), true);
 				var surface = bitmap.getSurface ();
 				graphics.__cairo = new Cairo (surface);
-				bitmap.destroySurface ();
-
+				surface.destroy ();
+				
 				graphics.__bitmap = bitmap;
 				
 			}

@@ -159,7 +159,6 @@ class BitmapData implements IBitmapDrawable {
 	@:noCompletion private var __buffer:GLBuffer;
 	@:noCompletion private var __isValid:Bool;
 	@:noCompletion private var __surface:CairoSurface;
-	@:noCompletion private var __surfaceFinalizer:BitmapDataSurfaceFinalizer;
 	@:noCompletion private var __texture:GLTexture;
 	@:noCompletion private var __textureImage:Image;
 	@:noCompletion private var __framebuffer:FilterTexture;
@@ -1136,24 +1135,11 @@ class BitmapData implements IBitmapDrawable {
 		if (__surface == null) {
 			
 			__surface = CairoImageSurface.fromImage (image);
-			__surfaceFinalizer = new BitmapDataSurfaceFinalizer (this);
 			
 		}
 		
 		return __surface;
 		
-	}
-
-
-	public function destroySurface ():Void {
-
-		if (__surface != null) {
-			__surface.destroy ();
-			__surface = null;
-			__surfaceFinalizer.invalidate ();
-			__surfaceFinalizer = null;
-		}
-
 	}
 	
 	
@@ -2393,33 +2379,6 @@ class BitmapData implements IBitmapDrawable {
 		
 	}
 	
-	
-}
-
-
-#if !macro
-@:build(lime.system.CFFI.build())
-#end
-
-@:noCompletion @:dox(hide) private class BitmapDataSurfaceFinalizer {
-
-
-	var b:BitmapData;
-
-	public function new (b:BitmapData) {
-		this.b = b;
-	}
-
-	public function invalidate ():Void {
-		b = null;
-	}
-
-	@:finalizer private function finalize () {
-		if (b != null) {
-			b.destroySurface ();
-		}
-	}
-
 	
 }
 
