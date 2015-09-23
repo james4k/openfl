@@ -826,7 +826,6 @@ class BitmapData implements IBitmapDrawable {
 		}
 		
 		surface.flush ();
-		cairo.destroy ();
 		
 		image.dirty = true;
 		
@@ -2221,7 +2220,6 @@ class BitmapData implements IBitmapDrawable {
 			
 			cairo.source = pattern;
 			cairo.paint ();
-			pattern.destroy ();
 			
 		}
 		
