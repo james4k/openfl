@@ -5,7 +5,7 @@ import lime.graphics.cairo.Cairo;
 import lime.graphics.cairo.CairoAntialias;
 import lime.graphics.cairo.CairoFontFace;
 import lime.graphics.cairo.CairoFontOptions;
-//import lime.graphics.cairo.CairoFTFontFace;
+import lime.graphics.cairo.CairoFTFontFace;
 import lime.graphics.cairo.CairoHintMetrics;
 import lime.graphics.cairo.CairoHintStyle;
 import lime.graphics.cairo.CairoImageSurface;
@@ -176,7 +176,25 @@ class CairoTextField {
 				
 				if (font != null && group.format.size != null) {
 					
-					cairo.fontFace = textEngine.getFontFace (font);
+					if (textEngine.__cairoFont != null) {
+						
+						if (textEngine.__font != font) {
+							
+							textEngine.__cairoFont.destroy ();
+							textEngine.__cairoFont = null;
+							
+						}
+						
+					}
+					
+					if (textEngine.__cairoFont == null) {
+						
+						textEngine.__font = font;
+						textEngine.__cairoFont = CairoFTFontFace.create (font, 0);
+						
+					}
+					
+					cairo.fontFace = textEngine.__cairoFont;
 					
 					size = Std.int (group.format.size);
 					cairo.setFontSize (size);
