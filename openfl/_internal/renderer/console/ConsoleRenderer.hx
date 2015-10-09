@@ -1239,17 +1239,6 @@ class ConsoleRenderer extends AbstractRenderer {
 
 				case UNKNOWN:
 
-/*
-
-	COMMANDS TODO
-
-	CubicCurveTo (controlX1:Float, controlY1:Float, controlX2:Float, controlY2:Float, anchorX:Float, anchorY:Float);
-	CurveTo (controlX:Float, controlY:Float, anchorX:Float, anchorY:Float);
-	DrawPathC(commands:Vector<Int>, data:Vector<Float>, winding:GraphicsPathWinding);
-	OverrideMatrix(matrix:Matrix);
-
-*/
-
 			}
 	
 		}
