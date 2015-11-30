@@ -140,9 +140,10 @@ import openfl.Lib;
 	}
 	
 	
-	public function createIndexBuffer (numIndices:Int):IndexBuffer3D {
+	public function createIndexBuffer (numIndices:Int, bufferUsage:Context3DBufferUsage = null):IndexBuffer3D {
 		
-		var indexBuffer = new IndexBuffer3D (this, GL.createBuffer (), numIndices);
+		if (bufferUsage == null) bufferUsage = Context3DBufferUsage.STATIC_DRAW;
+		var indexBuffer = new IndexBuffer3D (this, GL.createBuffer (), numIndices, bufferUsage == Context3DBufferUsage.STATIC_DRAW ? GL.STATIC_DRAW : GL.DYNAMIC_DRAW);
 		indexBuffersCreated.push (indexBuffer);
 		return indexBuffer;
 		
@@ -176,9 +177,10 @@ import openfl.Lib;
 	}
 	
 	
-	public function createVertexBuffer (numVertices:Int, data32PerVertex:Int):VertexBuffer3D {
+	public function createVertexBuffer (numVertices:Int, data32PerVertex:Int, bufferUsage:Context3DBufferUsage = null):VertexBuffer3D {
 		
-		var vertexBuffer = new VertexBuffer3D (this, GL.createBuffer (), numVertices, data32PerVertex);
+		if (bufferUsage == null) bufferUsage = Context3DBufferUsage.STATIC_DRAW;
+		var vertexBuffer = new VertexBuffer3D (this, GL.createBuffer (), numVertices, data32PerVertex, bufferUsage == Context3DBufferUsage.STATIC_DRAW ? GL.STATIC_DRAW : GL.DYNAMIC_DRAW);
 		vertexBuffersCreated.push (vertexBuffer);
 		return vertexBuffer;
 		
@@ -712,7 +714,7 @@ import openfl.Lib;
 		}
 		
 		GL.bindRenderbuffer (GL.RENDERBUFFER, renderbuffer);
-		#if ios
+		#if (ios || tvos)
 		GL.renderbufferStorage (GL.RENDERBUFFER, 0x88F0, texture.width, texture.height);
 		#else
 		GL.renderbufferStorage (GL.RENDERBUFFER, GL.RGBA, texture.width, texture.height);

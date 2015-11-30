@@ -8,7 +8,6 @@ import lime.graphics.opengl.GL;
 import lime.graphics.opengl.GLFramebuffer;
 import lime.graphics.GLRenderContext;
 import lime.math.Vector2;
-import lime.utils.ByteArray;
 import openfl._internal.renderer.AbstractRenderer;
 import openfl._internal.renderer.cairo.CairoGraphics;
 import openfl._internal.renderer.cairo.CairoTextField;
@@ -26,6 +25,7 @@ import openfl.geom.Matrix;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
 import openfl.text.TextField;
+import openfl.utils.ByteArray;
 
 #if (js && html5)
 import js.html.ImageData;
@@ -92,7 +92,7 @@ class GLRenderer extends AbstractRenderer {
 		_glContextId = glContextId ++;
 		this.gl = gl;
 		
-		#if ios
+		#if (ios || tvos)
 		defaultFramebuffer = new GLFramebuffer (GL.version, GL.getParameter (GL.FRAMEBUFFER_BINDING));
 		#else
 		defaultFramebuffer = null;
@@ -252,7 +252,7 @@ class GLRenderer extends AbstractRenderer {
 		
 		renderSession.gl = gl;
 		
-		#if ios
+		#if (ios || tvos)
 		defaultFramebuffer = new GLFramebuffer (GL.version, GL.getParameter (GL.FRAMEBUFFER_BINDING));
 		#else
 		defaultFramebuffer = null;
@@ -323,7 +323,7 @@ class GLRenderer extends AbstractRenderer {
 		matrix.translate (shape.__graphics.__bounds.x, shape.__graphics.__bounds.y);
 		matrix.concat (shape.__renderTransform);
 		
-		renderSession.spriteBatch.renderBitmapData (bitmap, smooth, matrix, shape.__worldColorTransform, shape.__worldAlpha, shape.__blendMode, ALWAYS);
+		renderSession.spriteBatch.renderBitmapData (bitmap, smooth, matrix, shape.__worldColorTransform, shape.__worldAlpha, shape.__blendMode, null, ALWAYS);
 		
 	}
 	

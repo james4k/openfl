@@ -1252,9 +1252,9 @@ class TextField extends InteractiveObject {
 	}
 	
 	
-	@:noCompletion private override function __hitTest (x:Float, y:Float, shapeFlag:Bool, stack:Array<DisplayObject>, interactiveOnly:Bool):Bool {
+	@:noCompletion private override function __hitTest (x:Float, y:Float, shapeFlag:Bool, stack:Array<DisplayObject>, interactiveOnly:Bool, hitObject:InteractiveObject):Bool {
 		
-		if (!visible || __isMask || (interactiveOnly && !mouseEnabled)) return false;
+		if (!hitObject.visible || __isMask || (interactiveOnly && !hitObject.mouseEnabled)) return false;
 		if (mask != null && !mask.__hitTestMask (x, y)) return false;
 		
 		__getWorldTransform ();
@@ -1267,7 +1267,7 @@ class TextField extends InteractiveObject {
 			
 			if (stack != null) {
 				
-				stack.push (this);
+				stack.push (hitObject);
 				
 			}
 			
@@ -1352,6 +1352,11 @@ class TextField extends InteractiveObject {
 	
 	
 	@:noCompletion @:dox(hide) public override function __renderGL (renderSession:RenderSession):Void {
+		
+		if (__cacheAsBitmap) {
+			__cacheGL(renderSession);
+			return;
+		}
 		
 		__preRenderGL(renderSession);
 		

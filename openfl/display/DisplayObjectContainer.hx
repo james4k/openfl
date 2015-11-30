@@ -86,7 +86,6 @@ class DisplayObjectContainer extends InteractiveObject {
 	 */
 	public var tabChildren:Bool;
 	
-	@:noCompletion private var __children:Array<DisplayObject>;
 	@:noCompletion private var __removedChildren:Array<DisplayObject>;
 	
 	
@@ -165,6 +164,7 @@ class DisplayObjectContainer extends InteractiveObject {
 			
 			child.__setTransformDirty ();
 			child.__setRenderDirty ();
+			__setRenderDirty();
 			
 			var event = new Event (Event.ADDED, true);
 			event.target = child;
@@ -238,6 +238,7 @@ class DisplayObjectContainer extends InteractiveObject {
 			
 			child.__setTransformDirty ();
 			child.__setRenderDirty ();
+			__setRenderDirty();
 			
 			var event = new Event (Event.ADDED, true);
 			event.target = child;
@@ -404,9 +405,8 @@ class DisplayObjectContainer extends InteractiveObject {
 	 */
 	public function getObjectsUnderPoint (point:Point):Array<DisplayObject> {
 		
-		point = localToGlobal (point);
 		var stack = new Array<DisplayObject> ();
-		__hitTest (point.x, point.y, false, stack, false);
+		__hitTest (point.x, point.y, false, stack, false, this);
 		stack.reverse ();
 		return stack;
 		
@@ -449,6 +449,7 @@ class DisplayObjectContainer extends InteractiveObject {
 			__removedChildren.push (child);
 			child.__setTransformDirty ();
 			child.__setRenderDirty ();
+			__setRenderDirty();
 			
 		}
 		
@@ -523,6 +524,25 @@ class DisplayObjectContainer extends InteractiveObject {
 			numRemovals--;
 			
 		}
+		
+	}
+	
+	
+	@:noCompletion @:dox(hide) private function resolve (fieldName:String):DisplayObject {
+		
+		if (__children == null) return null;
+		
+		for (child in __children) {
+			
+			if (child.name == fieldName) {
+				
+				return child;
+				
+			}
+			
+		}
+		
+		return null;
 		
 	}
 	
@@ -665,11 +685,11 @@ class DisplayObjectContainer extends InteractiveObject {
 	}
 	
 	
-	@:noCompletion private override function __enterFrame ():Void {
+	@:noCompletion private override function __enterFrame (deltaTime:Int):Void {
 		
 		for (child in __children) {
 			
-			child.__enterFrame ();
+			child.__enterFrame (deltaTime);
 			
 		}
 		
@@ -682,26 +702,23 @@ class DisplayObjectContainer extends InteractiveObject {
 		
 		if (__children.length == 0) return;
 		
-		var matrixCache = null;
-		
 		if (matrix != null) {
 			
-			matrixCache = __worldTransform;
-			__worldTransform = matrix;
+			__updateTransforms (matrix);
 			__updateChildren (true);
 			
 		}
 		
 		for (child in __children) {
 			
-			if (child.scaleX == 0 || child.scaleY == 0 || child.__isMask) continue;
+			if (child.scaleX == 0 || child.scaleY == 0) continue;
 			child.__getBounds (rect, child.__worldTransform);
 			
 		}
 		
 		if (matrix != null) {
 			
-			__worldTransform = matrixCache;
+			__updateTransforms ();
 			__updateChildren (true);
 			
 		}
@@ -709,9 +726,48 @@ class DisplayObjectContainer extends InteractiveObject {
 	}
 	
 	
-	@:noCompletion private override function __hitTest (x:Float, y:Float, shapeFlag:Bool, stack:Array<DisplayObject>, interactiveOnly:Bool):Bool {
+	@:noCompletion private override function __getRenderBounds (rect:Rectangle, matrix:Matrix):Void {
 		
-		if (!visible || __isMask || (interactiveOnly && !mouseEnabled && !mouseChildren)) return false;
+		if (__scrollRect != null) {
+			
+			super.__getRenderBounds (rect, matrix);
+			return;
+			
+		} else {
+			
+			super.__getBounds (rect, matrix);
+			
+		}
+		
+		if (__children.length == 0) return;
+		
+		if (matrix != null) {
+			
+			__updateTransforms (matrix);
+			__updateChildren (true);
+			
+		}
+		
+		for (child in __children) {
+			
+			if (child.scaleX == 0 || child.scaleY == 0 || child.__isMask) continue;
+			child.__getRenderBounds (rect, child.__worldTransform);
+			
+		}
+		
+		if (matrix != null) {
+			
+			__updateTransforms ();
+			__updateChildren (true);
+			
+		}
+		
+	}
+	
+	
+	@:noCompletion private override function __hitTest (x:Float, y:Float, shapeFlag:Bool, stack:Array<DisplayObject>, interactiveOnly:Bool, hitObject:InteractiveObject):Bool {
+		
+		if (!hitObject.visible || __isMask || (interactiveOnly && !hitObject.mouseEnabled && !mouseChildren)) return false;
 		if (mask != null && !mask.__hitTestMask (x, y)) return false;
 		if (scrollRect != null && !scrollRect.containsPoint (globalToLocal (new Point (x, y)))) return false;
 		
@@ -722,11 +778,11 @@ class DisplayObjectContainer extends InteractiveObject {
 				
 				while (--i >= 0) {
 					
-					if (__children[i].__hitTest (x, y, shapeFlag, null, true)) {
+					if (__children[i].__hitTest (x, y, shapeFlag, null, true, cast __children[i])) {
 						
 						if (stack != null) {
 							
-							stack.push (this);
+							stack.push (hitObject);
 							
 						}
 						
@@ -747,9 +803,9 @@ class DisplayObjectContainer extends InteractiveObject {
 					
 					interactive = __children[i].__getInteractive (null);
 					
-					if (interactive || (mouseEnabled && !hitTest)) {
+					if (interactive || (hitObject.mouseEnabled && !hitTest)) {
 						
-						if (__children[i].__hitTest (x, y, shapeFlag, stack, true)) {
+						if (__children[i].__hitTest (x, y, shapeFlag, stack, true, cast __children[i])) {
 							
 							hitTest = true;
 							
@@ -767,7 +823,7 @@ class DisplayObjectContainer extends InteractiveObject {
 				
 				if (hitTest) {
 					
-					stack.insert (length, this);
+					stack.insert (length, hitObject);
 					return true;
 					
 				}
@@ -778,7 +834,7 @@ class DisplayObjectContainer extends InteractiveObject {
 			
 			while (--i >= 0) {
 				
-				__children[i].__hitTest (x, y, shapeFlag, stack, false);
+				__children[i].__hitTest (x, y, shapeFlag, stack, false, cast __children[i]);
 				
 			}
 			
@@ -998,6 +1054,11 @@ class DisplayObjectContainer extends InteractiveObject {
 	@:noCompletion @:dox(hide) public override function __renderGL (renderSession:RenderSession):Void {
 		
 		if (!__renderable || __worldAlpha <= 0) return;
+		
+		if (__cacheAsBitmap) {
+			__cacheGL(renderSession);
+			return;
+		}
 		
 		__preRenderGL (renderSession);
 		__drawGraphicsGL (renderSession);

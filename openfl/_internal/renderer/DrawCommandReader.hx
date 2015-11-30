@@ -9,6 +9,7 @@ import openfl.display.GraphicsPathWinding;
 import openfl.display.InterpolationMethod;
 import openfl.display.JointStyle;
 import openfl.display.LineScaleMode;
+import openfl.display.Shader;
 import openfl.display.SpreadMethod;
 import openfl.display.Tilesheet;
 import openfl.display.TriangleCulling;
@@ -97,6 +98,7 @@ class DrawCommandReader {
 				ffPos += 1; //tileData
 				bPos += 1; //smooth
 				iPos += 2; //flags, count
+				oPos += 1;
 			
 			case DRAW_TRIANGLES:
 				
@@ -279,10 +281,10 @@ abstract CubicCurveToView (DrawCommandReader) {
 	public inline function new (d:DrawCommandReader) { this = d; }
 	public var controlX1 (get, never):Float; private inline function get_controlX1 ():Float { return this.float (0); }
 	public var controlY1 (get, never):Float; private inline function get_controlY1 ():Float { return this.float (1); }
-	public var controlX2 (get, never):Float; private inline function get_controlX2 ():Float { return this.float (3); }
-	public var controlY2 (get, never):Float; private inline function get_controlY2 ():Float { return this.float (4); }
-	public var anchorX (get, never):Float; private inline function get_anchorX ():Float { return this.float (5); }
-	public var anchorY (get, never):Float; private inline function get_anchorY ():Float { return this.float (6); }
+	public var controlX2 (get, never):Float; private inline function get_controlX2 ():Float { return this.float (2); }
+	public var controlY2 (get, never):Float; private inline function get_controlY2 ():Float { return this.float (3); }
+	public var anchorX (get, never):Float; private inline function get_anchorX ():Float { return this.float (4); }
+	public var anchorY (get, never):Float; private inline function get_anchorY ():Float { return this.float (5); }
 	
 }
 
@@ -360,6 +362,7 @@ abstract DrawTilesView (DrawCommandReader) {
 	public var tileData (get, never):Array<Float>; private inline function get_tileData ():Array<Float> { return this.fArr (0); }
 	public var smooth (get, never):Bool; private inline function get_smooth ():Bool { return this.bool (0); }
 	public var flags (get, never):Int; private inline function get_flags ():Int { return this.int (0); }
+	public var shader (get, never):Shader; private inline function get_shader ():Shader { return cast this.obj (0); }
 	public var count (get, never):Int; private inline function get_count ():Int { return this.int (1); }
 	
 }
@@ -390,8 +393,8 @@ abstract LineBitmapStyleView (DrawCommandReader) {
 	public inline function new (d:DrawCommandReader) { this = d; }
 	public var bitmap (get, never):BitmapData; private inline function get_bitmap ():BitmapData { return cast this.obj (0); }
 	public var matrix (get, never):Matrix; private inline function get_matrix ():Matrix { return cast this.obj (1); }
-	public var repeat (get, never):Bool; private inline function get_repeat ():Bool { return cast this.obj (2); }
-	public var smooth (get, never):Bool; private inline function get_smooth ():Bool { return cast this.obj (3); }
+	public var repeat (get, never):Bool; private inline function get_repeat ():Bool { return cast this.bool (0); }
+	public var smooth (get, never):Bool; private inline function get_smooth ():Bool { return cast this.bool (1); }
 	
 }
 

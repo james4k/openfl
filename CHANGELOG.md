@@ -1,3 +1,64 @@
+3.4.0 (10/28/2015)
+------------------
+
+* Fixed behavior of fillRect without alpha on non-transparent bitmapData
+* Fixed behavior of getColorBoundsRect on non-transparent bitmapData
+* Fixed red/blue color regression in some instances
+* Fixed transforms when using bitmapData.draw
+* Fixed support for Lime window scale (used on Mac retina)
+* Fixed a crash in Cairo rendering for near-zero dimensions
+* Fixed a null rect issue in OpenGL graphics drawTiles
+* Fixed access to System.totalMemory on HTML5
+* Fixed reference for default Noto Android font
+* Minor fixes for better scrollRect support 
+
+
+3.3.9 (10/15/2015)
+------------------
+
+* Preliminary support for custom DisplayObject shaders and filters on GL
+* Added support for netStream.close on HTML5
+* Fixed an issue where URLLoader would fail when there is no return data
+* Fixed an issue using bitmapData.fillRect and an invisible fill color
+* Fixed an issue with invisible images appearing on hit testing
+* Fixed native URLLoader requests to follow HTTP redirects
+* Fixed an issue with remote Loader requests on native
+
+
+3.3.8 (10/05/2015)
+------------------
+
+* Updated for new Lime Joystick support
+* Updated to allow SWFLite frame-rate independent MovieClips
+* Added MovieClip addFrameScript
+* Improved the behavior of SimpleButton
+* Improved the behavior of getObjectsUnderPoint
+
+
+3.3.7 (10/02/2015)
+------------------
+
+* Added support for object.FirstChild.SecondChild dynamic reference
+* Added FullScreenEvent for when the fullscreen status changes
+* Added minor tweaks to support Apple tvOS
+* Removed JoystickEvent (still available on legacy)
+* Improved the behavior of colorTransform concat
+* Improved openfl.utils.Object for better compatibility
+* Fixed a regression in reading values for graphics.lineBitmapStyle
+* Fixed displayObject mouseX/mouseY values when object not on stage
+* Fixed an edge case with bitmapData.getColorBoundsRect for 0 alpha
+* Fixed the position offset in graphics drawTiles on HTML5
+
+
+3.3.6 (09/23/2015)
+------------------
+
+* Updated for Lime 2.6.5 changes
+* Changed gradient style to use Array<Int> for ratio, not Float
+* Improved quality of joint style for closed paths
+* Fixed use of deprecated Assets.load syntax (without using futures)
+
+
 3.3.5 (09/21/2015)
 ------------------
 

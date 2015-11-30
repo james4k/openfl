@@ -4,7 +4,7 @@ package openfl.net; #if !flash #if (!openfl_legacy || disable_legacy_networking)
 import haxe.io.Bytes;
 import lime.app.Event;
 import lime.system.BackgroundWorker;
-import lime.utils.ByteArray;
+import lime.system.CFFI;
 import openfl.events.Event;
 import openfl.events.EventDispatcher;
 import openfl.events.HTTPStatusEvent;
@@ -339,22 +339,32 @@ class URLLoader extends EventDispatcher {
 					
 				}
 				
-				var bytes = ByteArray.readFile (path);
+				var bytes = readFile (path);
 				worker.sendComplete (bytes);
 				
 			});
 			worker.onComplete.add (function (bytes) {
 				
-				switch (dataFormat) {
+				if (bytes != null) {
 					
-					case BINARY: this.data = bytes;
-					default: this.data = bytes.readUTFBytes (bytes.length);
+					switch (dataFormat) {
+						
+						case BINARY: this.data = bytes;
+						default: this.data = bytes.readUTFBytes (bytes.length);
+						
+					}
+					
+					var evt = new Event (Event.COMPLETE);
+					evt.currentTarget = this;
+					dispatchEvent (evt);
+					
+				} else {
+					
+					var evt = new IOErrorEvent (IOErrorEvent.IO_ERROR);
+					evt.currentTarget = this;
+					dispatchEvent (evt);
 					
 				}
-				
-				var evt = new Event (Event.COMPLETE);
-				evt.currentTarget = this;
-				dispatchEvent (evt);
 				
 			});
 			worker.run ();
@@ -367,6 +377,17 @@ class URLLoader extends EventDispatcher {
 		}
 		#end
 		#end
+		
+	}
+	
+	
+	private function readFile (path:String):Bytes {
+		
+		#if (!flash && !html5 && !macro)
+		var data:Dynamic = lime_bytes_read_file (path);
+		if (data != null) return @:privateAccess new Bytes (data.length, data.b);
+		#end
+		return null;
 		
 	}
 	
@@ -443,9 +464,9 @@ class URLLoader extends EventDispatcher {
 		registerEvents (cast xmlHttpRequest);
 		var uri:Dynamic = "";
 		
-		if (Std.is (data, ByteArray)) {
+		if (Std.is (data, ByteArrayData)) {
 			
-			var data:ByteArray = cast data;
+			var data:ByteArrayData = cast data;
 			
 			switch (dataFormat) {
 				
@@ -542,7 +563,7 @@ class URLLoader extends EventDispatcher {
 		
 		var uri:ByteArray = new ByteArray ();
 		
-		if (Std.is (data, ByteArray)) {
+		if (Std.is (data, ByteArrayData)) {
 			
 			var data:ByteArray = cast data;
 			uri = data;
@@ -634,15 +655,16 @@ class URLLoader extends EventDispatcher {
 			
 		}
 		
+		CURLEasy.setopt (__curl, FOLLOWLOCATION, true);
+		CURLEasy.setopt (__curl, AUTOREFERER, true);
 		CURLEasy.setopt (__curl, HTTPHEADER, headers);
 		
 		CURLEasy.setopt (__curl, PROGRESSFUNCTION, progressFunction);
-		
 		CURLEasy.setopt (__curl, WRITEFUNCTION, writeFunction);
 		CURLEasy.setopt (__curl, HEADERFUNCTION, headerFunction);
 		
 		CURLEasy.setopt (__curl, SSL_VERIFYPEER, false);
-		CURLEasy.setopt (__curl, SSL_VERIFYHOST, false);
+		CURLEasy.setopt (__curl, SSL_VERIFYHOST, 0);
 		CURLEasy.setopt (__curl, USERAGENT, "libcurl-agent/1.0");
 		CURLEasy.setopt (__curl, CONNECTTIMEOUT, 30);
 		CURLEasy.setopt (__curl, TRANSFERTEXT, dataFormat == BINARY ? 0 : 1);
@@ -754,7 +776,7 @@ class URLLoader extends EventDispatcher {
 		
 		switch (dataFormat) {
 			
-			case BINARY: this.data = ByteArray.__ofBuffer (content);
+			case BINARY: this.data = ByteArrayData.__ofBuffer (content);
 			default: this.data = Std.string (content);
 			
 		}
@@ -845,6 +867,11 @@ class URLLoader extends EventDispatcher {
 		#end
 		
 	}
+	
+	
+	#if (!flash && !html5 && !macro)
+	private static var lime_bytes_read_file = CFFI.load ("lime", "lime_bytes_read_file", 1);
+	#end
 	
 	
 }

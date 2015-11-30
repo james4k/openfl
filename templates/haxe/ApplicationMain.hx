@@ -84,9 +84,9 @@ class ApplicationMain {
 		
 		preloader = null;
 		
-		::if (libraries != null)::::foreach libraries::::if (preload)::
-		total++;
-		openfl.Assets.loadLibrary ("::name::").onComplete (library_onLoad);
+		::if (libraries != null)::::foreach libraries::::if (preload)::total++;
+		::end::::end::::end::
+		::if (libraries != null)::::foreach libraries::::if (preload)::openfl.Assets.loadLibrary ("::name::").onComplete (library_onLoad);
 		::end::::end::::end::
 		
 		if (total == 0) {
@@ -187,7 +187,15 @@ class ApplicationMain {
 			
 		}
 		
+		#if !flash
+		if (openfl.Lib.current.stage.window.fullscreen) {
+			
+			openfl.Lib.current.stage.dispatchEvent (new openfl.events.FullScreenEvent (openfl.events.FullScreenEvent.FULL_SCREEN, false, false, true, true));
+			
+		}
+		
 		openfl.Lib.current.stage.dispatchEvent (new openfl.events.Event (openfl.events.Event.RESIZE, false, false));
+		#end
 		
 	}
 	

@@ -125,9 +125,9 @@ class Bitmap extends DisplayObject {
 	}
 	
 	
-	@:noCompletion private override function __hitTest (x:Float, y:Float, shapeFlag:Bool, stack:Array<DisplayObject>, interactiveOnly:Bool):Bool {
+	@:noCompletion private override function __hitTest (x:Float, y:Float, shapeFlag:Bool, stack:Array<DisplayObject>, interactiveOnly:Bool, hitObject:InteractiveObject):Bool {
 		
-		if (!visible || __isMask || bitmapData == null) return false;
+		if (!hitObject.visible || __isMask || bitmapData == null) return false;
 		if (mask != null && !mask.__hitTestMask (x, y)) return false;
 		
 		__getWorldTransform ();
@@ -139,7 +139,7 @@ class Bitmap extends DisplayObject {
 			
 			if (stack != null && !interactiveOnly) {
 				
-				stack.push (this);
+				stack.push (hitObject);
 				
 			}
 			
@@ -209,6 +209,10 @@ class Bitmap extends DisplayObject {
 	
 	@:noCompletion @:dox(hide) public override function __renderGL (renderSession:RenderSession):Void {
 		
+		if (__cacheAsBitmap) {
+			__cacheGL(renderSession);
+			return;
+		}
 		__preRenderGL (renderSession);
 		GLBitmap.render (this, renderSession);
 		__postRenderGL (renderSession);
