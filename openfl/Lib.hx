@@ -1,4 +1,4 @@
-package openfl; #if !openfl_legacy
+package openfl; #if !macro #if !openfl_legacy
 
 
 import lime.system.System;
@@ -174,4 +174,30 @@ import js.Browser;
 
 #else
 typedef Lib = openfl._legacy.Lib;
+#end
+#else
+
+
+import haxe.macro.Compiler;
+import haxe.macro.Context;
+
+
+class Lib {
+	
+	
+	public static function includeExterns ():Void {
+		
+		var childPath = Context.resolvePath ("extern/openfl");
+		
+		var parts = StringTools.replace (childPath, "\\", "/").split ("/");
+		parts.pop ();
+		
+		Compiler.addClassPath (parts.join ("/"));
+		
+	}
+	
+	
+}
+
+
 #end

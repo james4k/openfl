@@ -1,9 +1,4 @@
-package openfl.utils;
-
-
-#if flash
-typedef CompressionAlgorithm = flash.utils.CompressionAlgorithm;
-#elseif !openfl_legacy
+package openfl.utils; #if !openfl_legacy
 
 
 enum CompressionAlgorithm {

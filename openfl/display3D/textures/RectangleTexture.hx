@@ -1,4 +1,4 @@
-package openfl.display3D.textures; #if !flash
+package openfl.display3D.textures;
 
 
 import openfl.display.BitmapData;
@@ -116,8 +116,3 @@ import openfl.utils.UInt8Array;
 	
 	
 }
-
-
-#else
-typedef RectangleTexture = flash.display3D.textures.RectangleTexture;
-#end

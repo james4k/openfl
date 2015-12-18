@@ -220,18 +220,20 @@ abstract ByteArray(ByteArrayData) from ByteArrayData to ByteArrayData {
 }
 
 
-#if !display
-#if !flash
+#if (!display && !flash)
 
+
+@:autoBuild(lime.Assets.embedByteArray())
 
 @:noCompletion @:dox(hide) class ByteArrayData extends Bytes implements IDataInput implements IDataOutput {
 	
 	
 	public var bytesAvailable (get, never):UInt;
-	public var endian:Endian;
+	public var endian (get, set):Endian;
 	public var objectEncoding:UInt;
 	public var position:Int;
 	
+	private var __endian:Endian;
 	private var __length:Int;
 	
 	
@@ -757,12 +759,23 @@ abstract ByteArray(ByteArrayData) from ByteArrayData to ByteArrayData {
 	}
 	
 	
+	@:noCompletion private inline function get_endian ():Endian {
+		
+		return __endian;
+		
+	}
+	
+	
+	@:noCompletion private inline function set_endian (value:Endian):Endian {
+		
+		return __endian = value;
+		
+	}
+	
+	
 }
 
 
-#else
-typedef ByteArrayData = flash.utils.ByteArray;
-#end
 #else
 
 
@@ -793,6 +806,11 @@ typedef ByteArrayData = flash.utils.ByteArray;
  * </ul>
  * </p>
  */
+
+#if flash
+@:native("flash.utils.ByteArray")
+#end
+
 extern class ByteArrayData implements IDataOutput implements IDataInput implements ArrayAccess<Int> {
 	
 	
@@ -828,7 +846,14 @@ extern class ByteArrayData implements IDataOutput implements IDataInput implemen
 	 * Changes or reads the byte order for the data; either
 	 * <code>Endian.BIG_ENDIAN</code> or <code>Endian.LITTLE_ENDIAN</code>.
 	 */
+	#if (flash && !display)
 	public var endian:Endian;
+	#else
+	public var endian (get, set):Endian;
+	
+	private function get_endian ():Endian;
+	private function set_endian (value:Endian):Endian;
+	#end
 	
 	/**
 	 * The length of the ByteArray object, in bytes.
@@ -855,8 +880,8 @@ extern class ByteArrayData implements IDataOutput implements IDataInput implemen
 	 */
 	public var position:UInt;
 	
-	#if (flash && !display)
-	@:require(flash11_4) public var shareable:Bool;
+	#if flash
+	@:noCompletion @:dox(hide) @:require(flash11_4) public var shareable:Bool;
 	#end
 	
 	
@@ -868,13 +893,13 @@ extern class ByteArrayData implements IDataOutput implements IDataInput implemen
 	public function new ();
 	
 	
-	#if (flash && !display)
-	@:require(flash11_4) public function atomicCompareAndSwapIntAt (byteIndex:Int, expectedValue:Int, newValue:Int):Int;
+	#if flash
+	@:noCompletion @:dox(hide) @:require(flash11_4) public function atomicCompareAndSwapIntAt (byteIndex:Int, expectedValue:Int, newValue:Int):Int;
 	#end
 	
 	
-	#if (flash && !display)
-	@:require(flash11_4) public function atomicCompareAndSwapLength (expectedLength:Int, newLength:Int):Int;
+	#if flash
+	@:noCompletion @:dox(hide) @:require(flash11_4) public function atomicCompareAndSwapLength (expectedLength:Int, newLength:Int):Int;
 	#end
 	
 	
@@ -1105,8 +1130,8 @@ extern class ByteArrayData implements IDataOutput implements IDataInput implemen
 	 * @return The deserialized object.
 	 * @throws EOFError There is not sufficient data available to read.
 	 */
-	#if (flash && !display)
-	public function readObject ():Dynamic;
+	#if flash
+	@:noCompletion @:dox(hide) public function readObject ():Dynamic;
 	#end
 	
 	
@@ -1312,8 +1337,8 @@ extern class ByteArrayData implements IDataOutput implements IDataInput implemen
 	 * 
 	 * @param object The object to serialize.
 	 */
-	#if (flash && !display)
-	public function writeObject (object:Dynamic):Void;
+	#if flash
+	@:noCompletion @:dox(hide) public function writeObject (object:Dynamic):Void;
 	#end
 	
 	
@@ -1362,4 +1387,5 @@ extern class ByteArrayData implements IDataOutput implements IDataInput implemen
 #end
 #else
 typedef ByteArray = openfl._legacy.utils.ByteArray;
+typedef ByteArrayData = openfl._legacy.utils.ByteArray.ByteArrayData;
 #end
