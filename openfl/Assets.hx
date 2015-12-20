@@ -917,11 +917,7 @@ class Assets {
 	/* deprecated */ @:dox(hide) public var font:Map<String, Font>;
 	/* deprecated */ @:dox(hide) public var sound:Map<String, Sound>;
 	
-	#if lime_console
-	private var __enabled = false;
-	#else
 	private var __enabled = true;
-	#end
 	
 	
 	public function new () {
