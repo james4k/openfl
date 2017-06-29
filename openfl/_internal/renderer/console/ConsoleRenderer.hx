@@ -577,13 +577,13 @@ class ConsoleRenderer extends AbstractRenderer {
 		ctx.setVertexShaderConstantF (0, PointerUtil.fromMatrix (transform), 4);
 		ctx.setVertexShaderConstantF (4, cpp.Pointer.arrayElem (color, 0), 1);
 		ctx.setVertexSource (vertexBuffer);
-		ctx.setTexture (0, texture);
 		ctx.setTextureAddressMode (0, Clamp, Clamp);
 		if (smoothing) {
 			ctx.setTextureFilter (0, TextureFilter.Linear, TextureFilter.Linear);
 		} else {
 			ctx.setTextureFilter (0, TextureFilter.Nearest, TextureFilter.Nearest);
 		}
+		ctx.setTexture (0, texture);
 		ctx.draw (Primitive.TriangleStrip, 0, 2);
 
 		endClipRect ();
@@ -816,7 +816,6 @@ class ConsoleRenderer extends AbstractRenderer {
 		ctx.setVertexShaderConstantF (4, cpp.Pointer.arrayElem (lineColor, 0), 1);
 		ctx.setVertexSource (vertexBuffer);
 		ctx.setIndexSource (indexBuffer);
-		ctx.setTexture (0, texture);
 		if (lineBitmapRepeat) {
 			ctx.setTextureAddressMode (0, Wrap, Wrap);
 		} else {
@@ -827,6 +826,7 @@ class ConsoleRenderer extends AbstractRenderer {
 		} else {
 			ctx.setTextureFilter (0, TextureFilter.Nearest, TextureFilter.Nearest);
 		}
+		ctx.setTexture (0, texture);
 		ctx.drawIndexed (Primitive.Triangle, vertexCount, 0, div (indexCount, 3));
 
 	}
@@ -1033,7 +1033,6 @@ class ConsoleRenderer extends AbstractRenderer {
 						ctx.setVertexShaderConstantF (0, PointerUtil.fromMatrix (transform), 4);
 						ctx.setVertexShaderConstantF (4, cpp.Pointer.arrayElem (color, 0), 1);
 						ctx.setVertexSource (vertexBuffer);
-						ctx.setTexture (0, texture);
 						ctx.setTextureAddressMode (0, Clamp, Clamp);
 						if (fillBitmapRepeat) {
 							ctx.setTextureAddressMode (0, Wrap, Wrap);
@@ -1045,6 +1044,7 @@ class ConsoleRenderer extends AbstractRenderer {
 						} else {
 							ctx.setTextureFilter (0, TextureFilter.Nearest, TextureFilter.Nearest);
 						}
+						ctx.setTexture (0, texture);
 						ctx.draw (Primitive.TriangleStrip, 0, 2);
 
 					} else {
@@ -1362,13 +1362,13 @@ class ConsoleRenderer extends AbstractRenderer {
 					ctx.setVertexShaderConstantF (4, cpp.Pointer.arrayElem (fillColor, 0), 1);
 					ctx.setVertexSource (vertexBuffer);
 					ctx.setIndexSource (indexBuffer);
-					ctx.setTexture (0, texture);
 					ctx.setTextureAddressMode (0, Clamp, Clamp);
 					if (smooth) {
 						ctx.setTextureFilter (0, TextureFilter.Linear, TextureFilter.Linear);
 					} else {
 						ctx.setTextureFilter (0, TextureFilter.Nearest, TextureFilter.Nearest);
 					}
+					ctx.setTexture (0, texture);
 					ctx.drawIndexed (Primitive.Triangle, vertexCount, 0, itemCount * 2);
 					setBlendState (this.blendMode);
 
@@ -1420,13 +1420,13 @@ class ConsoleRenderer extends AbstractRenderer {
 					ctx.setVertexShaderConstantF (4, cpp.Pointer.arrayElem (fillColor, 0), 1);
 					ctx.setVertexSource (vertexBuffer);
 					ctx.setIndexSource (indexBuffer);
-					ctx.setTexture (0, texture);
 					ctx.setTextureAddressMode (0, Wrap, Wrap);
 					if (fillBitmapSmooth) {
 						ctx.setTextureFilter (0, TextureFilter.Linear, TextureFilter.Linear);
 					} else {
 						ctx.setTextureFilter (0, TextureFilter.Nearest, TextureFilter.Nearest);
 					}
+					ctx.setTexture (0, texture);
 					ctx.drawIndexed (Primitive.Triangle, vertexCount, 0, div (cmd.indices.length, 3));
 
 				case BEGIN_GRADIENT_FILL:
