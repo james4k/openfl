@@ -1336,7 +1336,10 @@ class ConsoleRenderer extends AbstractRenderer {
 					}
 
 					vertexBuffer.unlock ();
+
 					itemCount -= skippedItemCount;
+					if (itemCount <= 0) continue;
+
 					vertexCount = itemCount * 4;
 
 					var indexBuffer = transientIndexBuffer (itemCount * 6);
@@ -1394,6 +1397,9 @@ class ConsoleRenderer extends AbstractRenderer {
 					var cmdIndices = cmd.indices;
 					var cmdUvtData = cmd.uvtData;
 					var vertexCount = div (cmdVertices.length, 2);
+					var indexCount = cmdIndices.length;
+					if (vertexCount <= 0 || indexCount <= 0) continue;
+
 					var vertexBuffer = transientVertexBuffer (VertexDecl.PositionTexcoordColor, vertexCount);	
 					var out = vertexBuffer.lock ();
 					var i = 0;
@@ -1406,7 +1412,6 @@ class ConsoleRenderer extends AbstractRenderer {
 					}
 					vertexBuffer.unlock ();
 					
-					var indexCount = cmdIndices.length;
 					var indexBuffer = transientIndexBuffer (indexCount);
 					var unsafeIndices = indexBuffer.lock ();
 					for (i in 0...indexCount) {
