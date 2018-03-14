@@ -185,7 +185,7 @@ class ConsoleRenderer extends AbstractRenderer {
 			else if (color == true && scissor == false && palette == true) shaderDefault_color1_scissor0_palette1;
 			else if (color == false && scissor == true && palette == true) shaderDefault_color0_scissor1_palette1;
 			else if (color == true && scissor == true && palette == true) shaderDefault_color1_scissor1_palette1;
-			else shaderDefault_color0_scissor0;
+			else shaderDefault_color0_scissor0_palette0;
 	#else
 		return if (color == false && palette == false) shaderDefault_color0_scissor0_palette0;
 			else if (color == true && palette == false) shaderDefault_color1_scissor0_palette0;
