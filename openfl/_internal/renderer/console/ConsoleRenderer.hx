@@ -1500,6 +1500,12 @@ class ConsoleRenderer extends AbstractRenderer {
 						ctx.setTextureAddressMode (1, Clamp, Clamp);
 						ctx.setTextureFilter (1, TextureFilter.Nearest, TextureFilter.Nearest);
 					}
+				#if vita
+					// HACK: workaround an internal cache issue
+					if (usePalette) {
+						ctx.setTexture (0, whiteTexture);
+					}
+				#end
 					ctx.setTexture (0, texture);
 					if (usePalette) {
 						ctx.setTexture (1, texturePalette);
